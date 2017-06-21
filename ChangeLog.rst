@@ -16,7 +16,7 @@ Unreleased_
 Added
 ~~~~~
 
-- Add basic files required for Python packaging
+- Add basic files required for Python packaging.
 
 
 .. _Unreleased: https://github.com/zaufi/skeleton.py/release/1.0.0...HEAD

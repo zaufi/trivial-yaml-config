@@ -25,10 +25,10 @@ def get_requirements_from(filename):
         return f.readlines()
 
 # TODO Set proper version (or import your package with __version__ variable)
-version = '1.0.0'
+version = '0.1.0'
 
 setup(
-    name             = name
+    name             = 'Skeleton.py'
   , version          = version
   , description      = ''
   , long_description = readfile('README.rst')
@@ -45,9 +45,9 @@ setup(
       , 'Natural Language :: English'
       , 'Programming Language :: Python :: 3'
       ]
-  , keywords = ''
-  , install_requires   = get_requirements_from('requirements.txt')
-  , test_suite         = 'test'
-  , tests_require      = get_requirements_from('test-requirements.txt')
-  , zip_safe           = True
+  , keywords         = ''
+  , install_requires = get_requirements_from('requirements.txt')
+  , test_suite       = 'test'
+  , tests_require    = get_requirements_from('test-requirements.txt')
+  , zip_safe         = True
   )
