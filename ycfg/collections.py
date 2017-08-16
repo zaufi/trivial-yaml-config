@@ -78,7 +78,6 @@ class folded_keys_dict(collections.UserDict):
     __no_streamline = True
 
     def __init__(self, data, node_factory=dict_node_factory(), __calling_protected_ctor__=None):
-        self._dict_type = type(data)
         self.node_factory = node_factory
         if __calling_protected_ctor__ is not None and id(folded_keys_dict.__no_streamline) == id(__calling_protected_ctor__):
             self.data = data
@@ -115,7 +114,7 @@ class folded_keys_dict(collections.UserDict):
 
 
     def _streamline_dict(self, data):
-        result = self._dict_type()
+        result = self.node_factory.make_node()
 
         for key, value in data.items():
             assert isinstance(key, str)                     # NOTE For other type of keys this container have no sense

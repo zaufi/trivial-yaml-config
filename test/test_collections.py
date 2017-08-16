@@ -19,13 +19,26 @@
 
 # Project specific imports
 from context import make_data_filename
-from ycfg.collections import folded_keys_dict
+from ycfg.collections import folded_keys_dict, ordered_dict_node_factory
 
 # Standard imports
+import collections
 import pytest
 
 
-class collections_tester:
+_TEST_DICT = {
+    'lang.english': {
+        'counting.one': 1
+      , 'counting.two': 2
+      }
+  , 'lang.bahasa': {
+        'counting.satu': 1
+      , 'counting.dua': 2
+      }
+  }
+
+
+class folded_keys_dict_tester:
     '''
         TODO Tests for invalid keys?
              (Line w/ leading/trailing dots)
@@ -115,16 +128,7 @@ class collections_tester:
 
 
     def ctor_test_5(self):
-        d = folded_keys_dict({
-            'lang.english': {
-                'counting.one': 1
-              , 'counting.two': 2
-              }
-          , 'lang.bahasa': {
-                'counting.satu': 1
-              , 'counting.dua': 2
-              }
-          })
+        d = folded_keys_dict(_TEST_DICT)
 
         assert len(d) == 1
         assert 'lang' in d
@@ -149,16 +153,7 @@ class collections_tester:
 
 
     def access_test_1(self):
-        d = folded_keys_dict({
-            'lang.english': {
-                'counting.one': 1
-              , 'counting.two': 2
-              }
-          , 'lang.bahasa': {
-                'counting.satu': 1
-              , 'counting.dua': 2
-              }
-          })
+        d = folded_keys_dict(_TEST_DICT)
 
         l = d['lang']
         assert isinstance(l, folded_keys_dict)
@@ -183,32 +178,14 @@ class collections_tester:
       , ['root-not-exist', 'lang.not-exist', 'lang.english.counting.leaf-not-exist']
       )
     def access_test_2(self, key):
-        d = folded_keys_dict({
-            'lang.english': {
-                'counting.one': 1
-              , 'counting.two': 2
-              }
-          , 'lang.bahasa': {
-                'counting.satu': 1
-              , 'counting.dua': 2
-              }
-          })
+        d = folded_keys_dict(_TEST_DICT)
 
         with pytest.raises(KeyError):
             try_value = d[key]
 
 
     def access_test_3(self):
-        d = folded_keys_dict({
-            'lang.english': {
-                'counting.one': 1
-              , 'counting.two': 2
-              }
-          , 'lang.bahasa': {
-                'counting.satu': 1
-              , 'counting.dua': 2
-              }
-          })
+        d = folded_keys_dict(_TEST_DICT)
 
         with pytest.raises(TypeError):
             try_value = d['lang.english.counting.one.not-existed']
@@ -241,16 +218,7 @@ class collections_tester:
 
 
     def contains_test_1(self):
-        d = folded_keys_dict({
-            'lang.english': {
-                'counting.one': 1
-              , 'counting.two': 2
-              }
-          , 'lang.bahasa': {
-                'counting.satu': 1
-              , 'counting.dua': 2
-              }
-          })
+        d = folded_keys_dict(_TEST_DICT)
 
         assert 'lang' in d
 
@@ -281,32 +249,14 @@ class collections_tester:
       , ['root-not-exist', 'lang.not-exist', 'lang.english.counting.leaf-not-exist']
       )
     def delete_test_1(self, key):
-        d = folded_keys_dict({
-            'lang.english': {
-                'counting.one': 1
-              , 'counting.two': 2
-              }
-          , 'lang.bahasa': {
-                'counting.satu': 1
-              , 'counting.dua': 2
-              }
-          })
+        d = folded_keys_dict(_TEST_DICT)
 
         with pytest.raises(KeyError):
             del d[key]
 
 
     def delete_test_2(self):
-        d = folded_keys_dict({
-            'lang.english': {
-                'counting.one': 1
-              , 'counting.two': 2
-              }
-          , 'lang.bahasa': {
-                'counting.satu': 1
-              , 'counting.dua': 2
-              }
-          })
+        d = folded_keys_dict(_TEST_DICT)
 
         del d['lang.english.counting.one']
         assert len(d['lang.english.counting']) == 1
@@ -320,3 +270,28 @@ class collections_tester:
         assert len(d['lang']) == 1
         assert 'lang.bahasa' not in d
         assert 'lang.english' in d
+
+    def iterate_test_1(self):
+        d = folded_keys_dict(_TEST_DICT)
+
+        # No exceptions/errors expected
+        for k, v in d.items():
+            print('{}={}'.format(k, v))
+
+
+class folded_keys_ordered_dict_tester:
+
+    def iterate_test_1(self, capfd, expected_out):
+        #d = folded_keys_dict(_TEST_DICT)
+        d = folded_keys_dict(collections.OrderedDict(), node_factory=ordered_dict_node_factory())
+        d['lang.english.counting.one'] = 1
+        d['lang.english.counting.two'] = 2
+        d['lang.bahasa.counting.satu'] = 1
+        d['lang.bahasa.counting.dua'] = 2
+
+        # No exceptions/errors expected
+        import pprint
+        pprint.pprint(d)
+
+        stdout, stderr = capfd.readouterr()
+        assert expected_out == stdout
