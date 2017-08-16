@@ -26,6 +26,10 @@ import pytest
 
 
 class collections_tester:
+    '''
+        TODO Tests for invalid keys?
+             (Line w/ leading/trailing dots)
+    '''
 
     def ctor_test_1(self):
         d = folded_keys_dict({
@@ -194,6 +198,22 @@ class collections_tester:
             try_value = d[key]
 
 
+    def access_test_3(self):
+        d = folded_keys_dict({
+            'lang.english': {
+                'counting.one': 1
+              , 'counting.two': 2
+              }
+          , 'lang.bahasa': {
+                'counting.satu': 1
+              , 'counting.dua': 2
+              }
+          })
+
+        with pytest.raises(TypeError):
+            try_value = d['lang.english.counting.one.not-existed']
+
+
     def assign_test_1(self):
         d = folded_keys_dict({})
 
@@ -254,3 +274,49 @@ class collections_tester:
         assert 'satu' in l
         assert 'dua' in l
         assert 'tiga' not in l
+
+
+    @pytest.mark.parametrize(
+        'key'
+      , ['root-not-exist', 'lang.not-exist', 'lang.english.counting.leaf-not-exist']
+      )
+    def delete_test_1(self, key):
+        d = folded_keys_dict({
+            'lang.english': {
+                'counting.one': 1
+              , 'counting.two': 2
+              }
+          , 'lang.bahasa': {
+                'counting.satu': 1
+              , 'counting.dua': 2
+              }
+          })
+
+        with pytest.raises(KeyError):
+            del d[key]
+
+
+    def delete_test_2(self):
+        d = folded_keys_dict({
+            'lang.english': {
+                'counting.one': 1
+              , 'counting.two': 2
+              }
+          , 'lang.bahasa': {
+                'counting.satu': 1
+              , 'counting.dua': 2
+              }
+          })
+
+        del d['lang.english.counting.one']
+        assert len(d['lang.english.counting']) == 1
+        assert 'lang.english.counting.one' not in d
+        assert 'lang.english.counting.two' in d
+
+        del d['lang.english.counting']
+        assert 'lang.english.counting' not in d
+
+        del d['lang.bahasa']
+        assert len(d['lang']) == 1
+        assert 'lang.bahasa' not in d
+        assert 'lang.english' in d

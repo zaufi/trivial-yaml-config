@@ -88,6 +88,10 @@ class folded_keys_dict(collections.UserDict):
 
     #BEGIN Reduce functors
     def _build_node(self, state, item):
+        '''
+            TODO Make sure if the node exists it has a proper type
+                 and we r not going to override anything...
+        '''
         if item not in state:
             state[item] = self.node_factory.make_node()
 
@@ -95,10 +99,10 @@ class folded_keys_dict(collections.UserDict):
 
 
     def _traverse_keys_path(self, data, key):
-        if key in data:
-            return data[key]
+        if isinstance(data, self.node_factory.node_type):
+            return data[key]                                # NOTE May throw KeyError, and that is Ok
 
-        raise KeyError('Oops')
+        raise TypeError(key)
 
 
     def _check_keys_path(self, state, key):
@@ -146,6 +150,9 @@ class folded_keys_dict(collections.UserDict):
         except KeyError:
             raise KeyError('Key not found: `{}`'.format(key))
 
+        except TypeError as ex:
+            raise TypeError('Key not iterable: `{}`'.format(str(ex)))
+
 
     def __setitem__(self, key, value):
         parts = key.split('.')
@@ -153,7 +160,11 @@ class folded_keys_dict(collections.UserDict):
 
 
     def __delitem__(self, key):
-        pass
+        parts = key.split('.')
+
+        node = functools.reduce(self._traverse_keys_path, parts[:-1], self.data)
+        assert isinstance(node, self.node_factory.node_type)
+        del node[parts[-1]]                                 # NOTE This may throw KeyError
 
 
     def __contains__(self, key):
