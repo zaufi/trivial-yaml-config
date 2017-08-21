@@ -19,7 +19,7 @@
 
 # Project specific imports
 from context import make_data_filename
-from ycfg.collections import folded_keys_dict, ordered_dict_node_factory
+from ycfg.collections import folded_keys_dict, ordered_dict_node_factory, value_dict_pair, dict_and_value_node_factory
 
 # Standard imports
 import collections
@@ -269,7 +269,9 @@ class folded_keys_dict_tester:
         del d['lang.bahasa']
         assert len(d['lang']) == 1
         assert 'lang.bahasa' not in d
+        assert 'lang.bahasa.counting' not in d
         assert 'lang.english' in d
+
 
     def iterate_test_1(self):
         d = folded_keys_dict(_TEST_DICT)
@@ -279,10 +281,34 @@ class folded_keys_dict_tester:
             print('{}={}'.format(k, v))
 
 
+    def attribute_test_1(self):
+        d = folded_keys_dict(_TEST_DICT)
+
+        # Access dict items as attributes
+        assert d.lang.english.counting.one == 1
+        assert d.lang.bahasa.counting.dua == 2
+
+        assert len(d.lang) == 2
+
+        #d.lang.russian.counting.raz = 1
+
+    def equal_test_1(self):
+        d = folded_keys_dict(_TEST_DICT)
+        e = folded_keys_dict(_TEST_DICT)
+
+        assert id(d) != id(e)
+        assert d == e
+
+        assert d.lang.english.counting == e.lang.english.counting
+        assert d.lang.english.counting == {'one': 1, 'two': 2}
+
+        assert d.lang.english.counting.one == e.lang.english.counting.one
+        assert d.lang.english.counting.one == 1
+
+
 class folded_keys_ordered_dict_tester:
 
-    def iterate_test_1(self, capfd, expected_out):
-        #d = folded_keys_dict(_TEST_DICT)
+    def assign_test_1(self, capfd, expected_out):
         d = folded_keys_dict(collections.OrderedDict(), node_factory=ordered_dict_node_factory())
         d['lang.english.counting.one'] = 1
         d['lang.english.counting.two'] = 2
@@ -290,6 +316,45 @@ class folded_keys_ordered_dict_tester:
         d['lang.bahasa.counting.dua'] = 2
 
         # No exceptions/errors expected
+        import pprint
+        pprint.pprint(d)
+
+        stdout, stderr = capfd.readouterr()
+        assert expected_out == stdout
+
+
+class value_dict_pair_tester:
+
+    def assign_value_test(self):
+        p = value_dict_pair()
+        assert p.value is None
+        assert not p.data
+
+        p['lang'] = value_dict_pair()
+
+        assert p.value is None
+        assert 'lang' in p.data
+        assert 'lang' in p
+
+        assert p['lang'].value is None
+        assert not p['lang'].data
+
+
+class folded_keys_value_dict_pair_tester:
+
+    def assign_test_1(self, capfd, expected_out):
+        p = value_dict_pair(data=collections.OrderedDict())
+        d = folded_keys_dict(p, node_factory=dict_and_value_node_factory(node_prototype=p))
+
+        d['lang.english.counting.one'] = 1
+        assert d.lang.english.counting.one.value == 1
+
+        d['lang.english.counting.one.text'] = 'one'
+        assert d.lang.english.counting.one.text == 'one'
+
+        d['lang.english.counting.two.text'] = 'two'
+        d['lang.english.counting.two'] = 2
+
         import pprint
         pprint.pprint(d)
 
