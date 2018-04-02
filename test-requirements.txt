@@ -1,3 +1,4 @@
 pytest
 pytest-cov
-pytest-matcher
+pytest-matcher >= 1.2.0
+
