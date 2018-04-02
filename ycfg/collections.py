@@ -62,7 +62,7 @@ class ordered_dict_node_factory(abstract_node_factory):
         node[key] = value
 
 
-class value_dict_pair():
+class value_dict_pair(collections.Mapping):
 
     def __init__(self, value=None, data=None):
         self.data = data if data is not None else {}
@@ -151,12 +151,14 @@ class dict_and_value_node_factory(abstract_node_factory):
             node[key].value = value
 
 
-class folded_keys_dict:
+class folded_keys_dict(collections.Mapping):
 
     __no_straighten = True
 
-    def __init__(self, data, node_factory=None, __calling_protected_ctor__=None):
+    def __init__(self, data=None, node_factory=None, __calling_protected_ctor__=None):
         self.node_factory = node_factory if node_factory is not None else dict_node_factory()
+        if data is None:
+            data = {}
         if __calling_protected_ctor__ is not None and id(folded_keys_dict.__no_straighten) == id(__calling_protected_ctor__):
             self.data = data
         else:
@@ -269,6 +271,10 @@ class folded_keys_dict:
         return len(self.data)
 
 
+    def __iter__(self):
+        return iter(self.data)
+
+
     def items(self):
         return self.data.items()
 
@@ -279,6 +285,10 @@ class folded_keys_dict:
 
     def values(self):
         return self.data.values()
+
+
+    def update(self, other):
+        return self.data.update(other.data)
 
 
     def __getattr__(self, key):
@@ -323,3 +333,58 @@ class folded_keys_dict:
 
     def __eq__(self, other):
         return self.data == other.data if isinstance(other, folded_keys_dict) else other
+
+
+class dict_stack(collections.Mapping):
+
+    def __init__(self, *args, writable_layer=None):
+        assert functools.reduce(lambda s, x: s and issubclass(type(x), collections.Mapping), args, True)
+        self._stack = list(args)
+        self._stack.reverse()
+        self._writable_layer = writable_layer if writable_layer is not None else {}
+
+
+    def keys(self):
+        return list(set(itertools.chain.from_iterable(c.keys() for c in self)))
+
+
+    def __getitem__(self, key):
+        merged = None
+        for scope in [self._writable_layer] + self._stack:
+            # Is key exists at the current level
+            if key in scope:
+                # Yep, get it.
+                item = scope[key]
+                # If the key is partial, so `item` is a "subtree"
+                if isinstance(item, folded_keys_dict):
+                    # Yep, check if this is the first occurence...
+                    if merged is None:
+                        merged = item                       # ... then just assign it to future result.
+                    else:
+                        merged.update(item)                 # ... no, some results was found on previous levels, then merge!
+
+                # Ok, item is just a value. Check if prevous levels gave no partial results.
+                elif merged is None:
+                    return scope[key]                       # No! Then just return found item.
+
+                else:
+                    raise ValueError()
+
+        if merged is None:
+            raise KeyError(key)
+
+        # TODO Turn `merged` into read-only
+        return merged
+
+
+    def __setitem__(self, key, value):
+        self._writable_layer[key] = value
+        print('self._writable_layer={}'.format(repr(self._writable_layer)))
+
+
+    def __len__(self):
+        return len(self._stack)
+
+
+    def __iter__(self):
+        return itertools.chain.from_iterable([self._writable_layer] + self._stack)

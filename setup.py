@@ -4,12 +4,11 @@
 #
 
 # Project specific imports
-# TODO Import package/module w/ `__version__` variable
 
 # Standard imports
 import pathlib
 from setuptools import setup, find_packages
-
+from ycfg.version import __version__
 
 def sources_dir():
     return pathlib.Path(__file__).parent
@@ -24,18 +23,15 @@ def get_requirements_from(filename):
     with (sources_dir() / filename).open(encoding='UTF-8') as f:
         return f.readlines()
 
-# TODO Set proper version (or import your package with __version__ variable)
-version = '0.1.0'
-
 setup(
-    name             = 'Skeleton.py'
-  , version          = version
-  , description      = ''
+    name             = 'ycfg'
+  , version          = __version__
+  , description      = 'Easy way to get and access configuration data from YAML files'
   , long_description = readfile('README.rst')
   , author           = 'Alex Turbov'
   , author_email     = 'I.zaufi@gmail.com'
-  , url              = ''
-  , download_url     = 'https://github.com/zaufi/{name}/archive/release/{version}.tar.gz'.format(name, version)
+  , url              = 'https://github.com/zaufi/trivial-yaml-config'
+  , download_url     = 'https://github.com/zaufi/trivial-yaml-config/archive/release/{}.tar.gz'.format(__version__)
   , packages         = find_packages(exclude=('test'))
   , license          = 'GNU General Public License v3 or later (GPLv3+)'
   , classifiers      = [

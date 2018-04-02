@@ -19,7 +19,12 @@
 
 # Project specific imports
 from context import make_data_filename
-from ycfg.collections import folded_keys_dict, ordered_dict_node_factory, value_dict_pair, dict_and_value_node_factory
+from ycfg.collections import \
+    dict_stack  \
+  , dict_and_value_node_factory \
+  , folded_keys_dict \
+  , ordered_dict_node_factory \
+  , value_dict_pair
 
 # Standard imports
 import collections
@@ -217,6 +222,19 @@ class folded_keys_dict_tester:
         assert d['lang.english.two'] == 2
 
 
+    def assign_test_2(self):
+        d = folded_keys_dict(_TEST_DICT)
+
+        # Use subtree to assign new values indirectory to `d`
+        l = d['lang']
+        l['russian.counting.raz'] = 1
+        l['russian.counting.dva'] = 2
+
+        assert 'lang.russian.counting' in d
+        assert d['lang.russian.counting.raz'] == 1
+        assert d['lang.russian.counting.dva'] == 2
+
+
     def contains_test_1(self):
         d = folded_keys_dict(_TEST_DICT)
 
@@ -306,6 +324,27 @@ class folded_keys_dict_tester:
         assert d.lang.english.counting.one == 1
 
 
+    def update_test_1(self):
+        d = folded_keys_dict(_TEST_DICT)
+        e = d['lang.english.counting']
+        d.update(e)
+
+        assert 'one' in d
+        assert 'two' in d
+
+
+    def immutable_test_1(self):
+        d = folded_keys_dict(_TEST_DICT)
+
+        # Extracting and changing a subtree doesn't affect the source
+        e = d['lang.english.counting']
+        e.one = 2
+        e.two = 1
+
+        assert d['lang.english.counting.one'] == 1
+        assert d['lang.english.counting.two'] == 2
+
+
 class folded_keys_ordered_dict_tester:
 
     def assign_test_1(self, capfd, expected_out):
@@ -360,3 +399,65 @@ class folded_keys_value_dict_pair_tester:
 
         stdout, stderr = capfd.readouterr()
         assert expected_out == stdout
+
+
+class dict_stack_tester:
+
+    def access_test_1(self):
+        s = dict_stack({'one': 1}, {'two': 2, 'three': 3})
+
+        assert 'one' in s
+        assert s['one'] == 1
+
+        assert 'two' in s
+        assert s['two'] == 2
+
+        assert 'three' in s
+        assert s['three'] == 3
+
+        assert 'four' not in s
+
+
+    def access_test_2(self):
+        d = folded_keys_dict(_TEST_DICT)
+        e = folded_keys_dict({'lang.russian.counting.raz': 1})
+
+        s = dict_stack(d, e, writable_layer=folded_keys_dict())
+
+        assert len(s['lang']) == 3
+
+        assert len(s['lang.english.counting']) == 2
+
+        assert s['lang.english.counting.one'] == 1
+        assert s['lang.english.counting.two'] == 2
+
+        assert s['lang.russian.counting.raz'] == 1
+
+        s['lang.english.counting.three'] = 3
+        assert len(s['lang.english.counting']) == 3
+
+
+    def assign_test_1(self, capfd, expected_out):
+        w = {}
+        s = dict_stack({'one': 1}, {'two': 2, 'three': 3})
+
+        assert 'one' in s
+
+    #def assign_test_2(self, capfd, expected_out):
+        #p = value_dict_pair(data=collections.OrderedDict())
+        #d = folded_keys_dict(p, node_factory=dict_and_value_node_factory(node_prototype=p))
+        #e = folded_keys_dict(p, node_factory=dict_and_value_node_factory(node_prototype=p))
+        #f = folded_keys_dict(p, node_factory=dict_and_value_node_factory(node_prototype=p))
+
+        #d['lang.counting.english.one'] = 1
+        #d['lang.counting.english.two'] = 2
+        #e['lang.counting.bahasa.satu'] = 1
+        #e['lang.counting.bahasa.dua'] = 2
+        #f['lang.counting'] = ['english', 'bahasa']
+
+        #s = dict_stack(d, e, f, writable_layer=folded_keys_dict())
+
+        #t = s['lang.counting']
+
+        #assert len(t) == 2
+
