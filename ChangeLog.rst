@@ -10,13 +10,14 @@ The format is based on `Keep a Changelog`_ and this project adheres to `Semantic
 .. _`Semantic Versioning`: http://semver.org/
 
 
-Unreleased_
------------
+0.1.0_ -- 2018-04-02
+--------------------
 
 Added
 ~~~~~
 
-- Add basic files required for Python packaging.
+- Add basic functions.
 
 
-.. _Unreleased: https://github.com/zaufi/skeleton.py/release/1.0.0...HEAD
+.. _Unreleased: https://github.com/zaufi/https://github.com/zaufi/trivial-yaml-config/release/0.1.0...HEAD
+.. _0.1.0: https://github.com/zaufi/trivial-yaml-config/releases/tag/release%2F0.1.0
