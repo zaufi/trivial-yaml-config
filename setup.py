@@ -30,8 +30,8 @@ setup(
   , long_description = readfile('README.rst')
   , author           = 'Alex Turbov'
   , author_email     = 'I.zaufi@gmail.com'
-  , url              = 'https://github.com/zaufi/trivial-yaml-config'
-  , download_url     = 'https://github.com/zaufi/trivial-yaml-config/archive/release/{}.tar.gz'.format(__version__)
+  , url              = 'https://github.com/zaufi/ycfg'
+  , download_url     = 'https://github.com/zaufi/ycfg/archive/release/{}.tar.gz'.format(__version__)
   , packages         = find_packages(exclude=('test'))
   , license          = 'GNU General Public License v3 or later (GPLv3+)'
   , classifiers      = [

@@ -28,6 +28,6 @@ Added
 - Add basic functions.
 
 
-.. _Unreleased: https://github.com/zaufi/https://github.com/zaufi/trivial-yaml-config/release/0.2.0...HEAD
-.. _0.2.0: https://github.com/zaufi/https://github.com/zaufi/trivial-yaml-config/release/0.1.0...release/0.2.0
-.. _0.1.0: https://github.com/zaufi/trivial-yaml-config/releases/tag/release/0.1.0
+.. _Unreleased: https://github.com/zaufi/https://github.com/zaufi/ycfg/release/0.2.0...HEAD
+.. _0.2.0: https://github.com/zaufi/https://github.com/zaufi/ycfg/release/0.1.0...release/0.2.0
+.. _0.1.0: https://github.com/zaufi/ycfg/releases/tag/release/0.1.0

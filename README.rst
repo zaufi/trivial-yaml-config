@@ -9,7 +9,7 @@ The package to simplify a usual work with configuration files from Python progra
 
 .. |Latest Release| image:: https://badge.fury.io/py/ycfg.svg
     :target: https://pypi.org/project/ycfg/#history
-.. |Build Status| image:: https://travis-ci.org/zaufi/trivial-yaml-config.svg?branch=master
-   :target: https://travis-ci.org/zaufi/trivial-yaml-config
+.. |Build Status| image:: https://travis-ci.org/zaufi/ycfg.svg?branch=master
+   :target: https://travis-ci.org/zaufi/ycfg
 .. |nbsp| unicode:: 0xA0
    :trim:
