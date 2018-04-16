@@ -16,7 +16,7 @@
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Project specific imports
-from .ordered_dict_yaml_loader import ordered_dict_yaml_loader
+from .yaml import ordered_dict_loader
 
 # Standard imports
 import collections
@@ -46,12 +46,9 @@ class items_as_attributes(collections.UserDict):
 
 class config(collections.UserDict):
 
-    def __init__(self, filename: pathlib.Path, no_conversions=False):
+    def __init__(self, filename: pathlib.Path):
         with filename.open('r') as f:
-            aux = {}
-            if no_conversions:
-                aux['Loader'] = yaml.BaseLoader
-            data = yaml.load(f, ordered_dict_yaml_loader, **aux)
+            data = yaml.load(f, ordered_dict_loader)
 
         if data is None:
             self.data = {}

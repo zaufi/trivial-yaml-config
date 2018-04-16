@@ -19,7 +19,7 @@ import yaml
 import yaml.constructor
 
 
-class ordered_dict_yaml_loader(yaml.Loader):
+class ordered_dict_loader(yaml.Loader):
     '''
         A YAML loader that loads mappings into ordered dictionaries.
 

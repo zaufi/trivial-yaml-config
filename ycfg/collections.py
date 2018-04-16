@@ -379,7 +379,6 @@ class dict_stack(collections.Mapping):
 
     def __setitem__(self, key, value):
         self._writable_layer[key] = value
-        print('self._writable_layer={}'.format(repr(self._writable_layer)))
 
 
     def __len__(self):
